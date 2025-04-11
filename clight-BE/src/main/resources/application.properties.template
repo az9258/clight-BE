@@ -1,0 +1,60 @@
+# Spring 应用配置
+spring:
+  application:
+    # 应用名称，用于区分不同的 Spring Boot 应用
+    name: userSys
+
+  data:
+    # MongoDB 数据库配置
+    mongodb:
+      # MongoDB 服务器地址
+      host: 127.0.0.1
+      # MongoDB 服务器端口
+      port: 27017
+      # MongoDB 用户名
+      username: clight
+      # MongoDB 密码（当前为空，需要根据实际环境配置）
+      password:
+      # MongoDB 数据库名称
+      database: clight
+      # MongoDB 认证数据库（用于用户认证的数据库）
+      authentication-database: admin
+
+    # Redis 缓存配置
+    redis:
+      # Redis 服务器地址
+      host: localhost
+      # Redis 服务器端口
+      port: 6379
+      # Redis 密码（当前为空，需要根据实际环境配置）
+      password:
+
+  # 定时任务线程池配置
+  task:
+    execution:
+      pool:
+        # 线程池的核心线程数（最小线程数）
+        core-size: 5
+        # 线程池的最大线程数（最大线程数）
+        max-size: 10
+        # 线程池的任务队列容量
+        queue-capacity: 100
+        # 空闲线程的存活时间（单位：秒）
+        keep-alive: 60s
+
+# 服务器配置
+server:
+  # 应用运行的端口号
+  port: 8080
+
+# JWT 配置
+jwt:
+  # JWT 密钥（需要填写实际的密钥值）
+  key-value:
+  # JWT 过期时间（单位：毫秒，86400000 表示 7 天）
+  expiration: 86400000  # 7天
+
+# MD5 加密配置
+md5:
+  # MD5 加密的盐值（需要填写实际的盐值）
+  salt:
