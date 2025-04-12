@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * 用户Mapper接口
+ * 提供 users 表的增删改查方法
+ */
 @Repository
 public interface UserMapper {
 

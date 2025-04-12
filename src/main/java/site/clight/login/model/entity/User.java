@@ -14,6 +14,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.Date;
 import java.util.Set;
 
+/**
+ * 用户实体类，用于表示用户的基本信息
+ * 与数据库中的 "users" 集合对应
+ */
 @Document(collection = "users")
 @Data
 @AllArgsConstructor
@@ -35,11 +39,9 @@ public class User {
     private String password;
 
     @Field(name = "created_at")
-    @CreatedDate
     private Date createdAt;
 
     @Field(name = "update_at")
-    @LastModifiedDate
     private Date updatedAt;
 
     @Field

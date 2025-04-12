@@ -8,6 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Set;
 
+/**
+ * 用户响应类，用于封装用户信息。
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -3,6 +3,9 @@ package site.clight.login.service;
 import site.clight.login.model.dto.request.RegisterRequest;
 import site.clight.login.utils.Result;
 
+/**
+ * 注册服务接口，定义了注册相关的业务逻辑。
+ */
 public interface RegisterService {
 
     /**

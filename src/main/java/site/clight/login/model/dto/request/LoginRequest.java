@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 登录请求类，用于接收用户登录请求的参数。
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

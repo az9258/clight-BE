@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 注册请求类，用于封装用户注册时提交的信息。
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

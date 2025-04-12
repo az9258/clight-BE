@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,12 @@ public class UserMapperImpl implements UserMapper {
         return convertToUserResponse(user);
     }
 
+    /**
+     * 根据用户名和密码查询用户
+     * @param username 用户名
+     * @param password 密码
+     * @return 用户响应对象
+     */
     @Override
     public UserResponse findUser(String username, String password) {
         Query query = new Query(Criteria.where("username").is(username));
@@ -88,6 +96,7 @@ public class UserMapperImpl implements UserMapper {
         if (user.getPassword() != null) {
             update.set("password", user.getPassword());
         }
+        update.set("update_at", new Date());
         return mongoTemplate.updateFirst(query, update, User.class).wasAcknowledged();
     }
 

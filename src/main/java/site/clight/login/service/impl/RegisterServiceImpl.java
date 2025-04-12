@@ -15,82 +15,98 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * 用户注册服务实现类
+ */
 @Service
 public class RegisterServiceImpl implements RegisterService {
 
     @Value("${md5.salt}")
-    private String salt;
+    private String salt;  // MD5加密盐值
 
     @Autowired
-    private UserMapper userMapper;
+    private UserMapper userMapper;  // 用户数据访问接口
 
     @Autowired
-    private JWTUtil jwtUtil;
+    private JWTUtil jwtUtil;  // JWT工具类
 
     @Autowired
-    private RedisService redisService;
+    private RedisService redisService;  // Redis服务
 
     @Autowired
-    private ExecutorService executorService;
+    private ExecutorService executorService;  // 线程池，用于异步操作
 
+    /**
+     * 用户注册方法
+     * @param registerRequest 注册请求参数
+     * @return 包含JWT token的响应结果
+     */
     @Override
     public Result<String> register(RegisterRequest registerRequest) {
-        /*
-            1. 账号是否存在?
-            2. 存在 账号已经被注册
-            3. 不存在 注册用户
-            4. 生成 token
-            5. 存入 token 到 redis
-            6. 加上事务？
-         */
+        // 检查用户名是否已存在
         if (userMapper.findByUsername(registerRequest.getUsername()) != null) {
             return Result.fail(ResponseCode.ACCOUNT_EXIST.getCode(), ResponseCode.ACCOUNT_EXIST.getMsg());
         }
+        
+        // 使用MD5加盐加密密码
         String password = DigestUtils.md5Hex(registerRequest.getPassword() + salt);
 
+        // 创建用户实体
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setPassword(password);
         user.setEmail(registerRequest.getEmail());
-        user.setRoles(Set.of("NORMAL"));
-        user.setStatus(1);
+        user.setCreatedAt(new Date());
+        user.setUpdatedAt(new Date());
+        user.setRoles(Set.of("NORMAL"));  // 默认角色为NORMAL
+        user.setStatus(1);  // 默认状态为激活
 
+        // 插入用户数据
         userMapper.insertUser(user);
 
-        // 检查用户插入是否成功
+        // 验证用户是否插入成功
         UserResponse userResponse = userMapper.findByUsername(registerRequest.getUsername());
         if (userResponse == null) {
             return Result.fail();
         }
+        
+        // 生成JWT token
         String token = jwtUtil.generateToken(String.valueOf(userResponse.getId()));
 
-        // 将 token 存入 Redis
+        // 将token存入Redis
         saveTokenInRedis(token, userResponse, user);
 
         return Result.success(token);
     }
 
+    /**
+     * 将token保存到Redis中
+     * @param token JWT token
+     * @param userResponse 用户响应数据
+     * @param user 用户实体(用于回滚操作)
+     */
     private void saveTokenInRedis(String token, UserResponse userResponse, User user) {
         try {
-            // 使用 Future 来控制 Redis 操作的超时时间
+            // 使用Future来控制Redis操作的超时时间
             Future<?> future = executorService.submit(() -> {
                 redisService.setWithExpire("TOKEN" + token, JSON.toJSONString(userResponse), 1, TimeUnit.DAYS);
             });
 
-            // 等待1秒，如果超过1秒未完成，抛出 TimeoutException
+            // 设置1秒超时等待
             future.get(1, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            // 如果 Redis 操作超时，回滚事务并删除用户
+            // Redis操作超时，回滚用户数据
             userMapper.deleteByUsername(user.getUsername());
             throw new RuntimeException("Redis 操作超时", e);
         } catch (Exception e) {
-            // 其他异常处理
+            // 其他异常处理，回滚用户数据
             userMapper.deleteByUsername(user.getUsername());
             throw new RuntimeException("Redis 操作失败", e);
         }
