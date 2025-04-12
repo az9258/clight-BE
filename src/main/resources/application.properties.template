@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: login-demo
+
+  data:
+    ### MongoDB 配置 ###
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      username: clight
+      password:
+      database: clight
+      authentication-database: admin
+    ### Redis 配置 ###
+    redis:
+      host: localhost
+      port: 6379
+      password:
+
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10
+        queue-capacity: 100
+        keep-alive: 60s
+
+
+### jwt token ###
+jwt:
+  key-value:
+  expiration: 86400000  # 7天
+
+md5:
+  salt:
