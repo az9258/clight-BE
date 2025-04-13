@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
  * 退出登入
  */
 @RestController
-@RequestMapping("/api/logout")
+@RequestMapping("/api/auth")
 public class LogoutController {
 
     @Autowired
     UsersService usersService;
 
-    @GetMapping
+    @GetMapping("logout")
     public Result<String> currentUser(@RequestHeader("Authorization") String token) {
         return usersService.logout(token);
     }
